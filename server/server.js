@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.post('/todos', (req, res) => {
   var todo = new Todo({
     text: req.body.text
-  }); 
+  });
 
   todo.save().then((doc) => {
     res.send(doc);
@@ -44,12 +44,32 @@ app.get('/todos/:id', (req, res) => {
   Todo.findById(id).then((todo) => {
     if (!todo) {
       res.status(404).send({});
-      return console.log('User not found');
+      return console.log('Todo not found');
     } else {
       res.status(200).send({todo});
-      return console.log('User found');
+      return console.log('Todo found');
     }
   }).catch((e) => {res.status(400).send({e})});
+});
+
+app.delete('/todos/:id', (req, res) => {
+  var id = req.params.id;
+
+  if(!ObjectID.isValid(id)) {
+    res.status(404).send();
+    return console.log('Invalid ID');
+  }
+
+  Todo.findByIdAndRemove(id).then((todo) => {
+    if (!todo) {
+      res.status(404).send();
+      return console.log('Todo not found');
+    } else {
+      res.send(todo);
+      return console.log('Todo found');
+    }
+  }).catch((e) => {res.status(400).send(e)});
+
 });
 
 app.listen(port, () => {
